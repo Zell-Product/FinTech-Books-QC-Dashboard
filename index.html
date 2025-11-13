@@ -33,22 +33,22 @@
              --medium-text: #b45309;
              --bad-text: #c53030;
             --spinner-color: var(--accent-color);
-            --header-height: 64px; /* Slightly reduced header height */
+            --header-height: 64px;
         }
         html {
             scroll-behavior: smooth;
-            height: 100%; /* FIX: Set HTML height for proper container sizing */
-            overflow: hidden; /* FIX: Prevent external scrollbars */
+            height: 100%;
+            overflow: hidden;
         }
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             padding-top: var(--header-height);
-            display: flex; /* REQUIRED */
-            flex-direction: column; /* REQUIRED */
-            height: 100%; /* FIX: Set body height to 100% */
-            overflow: hidden; /* Prevent body scroll */
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
             transition: padding-top 0.3s ease;
          }
          body::-webkit-scrollbar { width: 8px; }
@@ -59,7 +59,7 @@
         .fa-sync-alt.animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-         /* Glassy Sticky Header (Dashboard) */
+         /* Glassy Sticky Header */
         #appHeader {
             position: sticky; top: 0; left: 0; right: 0; z-index: 50;
             background-color: var(--header-bg);
@@ -70,17 +70,17 @@
         }
          @media (min-width: 768px) { #appHeader { padding: 0 2rem; } }
 
-         /* Main content container - CRITICAL FOR LAYOUT */
+         /* Main content container */
          #appContainer {
-             flex-grow: 1; /* REQUIRED: Allow container to take remaining space */
-             display: flex; /* REQUIRED */
-             flex-direction: column; /* REQUIRED */
+             flex-grow: 1;
+             display: flex;
+             flex-direction: column;
              width: 100%; max-width: 1152px; /* max-w-6xl */
              margin-left: auto; margin-right: auto;
              padding-left: 1rem; padding-right: 1rem; padding-bottom: 2rem;
              opacity: 0; transition: opacity 0.5s ease, max-width 0.3s ease, padding 0.3s ease;
-             min-height: 0; /* REQUIRED: Prevent flex item overflow */
-             overflow-y: auto; /* Allow scrolling ONLY within this container */
+             min-height: 0;
+             overflow-y: auto;
          }
           @media (min-width: 768px) { #appContainer { padding-left: 2rem; padding-right: 2rem;} }
 
@@ -90,15 +90,13 @@
             backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
         }
-         /* Page content - CRITICAL FOR LAYOUT */
         .page-content {
              padding-top: 1.5rem;
              padding-bottom: 0;
-             flex-grow: 1; /* REQUIRED: Allow page content to grow */
+             flex-grow: 1;
              display: flex; flex-direction: column;
-             min-height: 0; /* REQUIRED: Prevent flex item overflow */
-             /* CRITICAL FIX: Ensure the dashboard page itself uses up ALL vertical space */
-             min-height: calc(100vh - var(--header-height) - 2rem); /* 2rem is bottom padding of appContainer */
+             min-height: 0;
+             min-height: calc(100vh - var(--header-height) - 2rem);
          }
 
         /* Accordion Styles */
@@ -112,14 +110,44 @@
             padding: 1rem 1.5rem; cursor: pointer; transition: background-color 0.2s ease;
             display: flex; justify-content: space-between; align-items: center;
         }
+        /* --- NEW: Style for locked book header --- */
+        .book-header[data-locked="true"] {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .book-header[data-locked="true"]:hover {
+            background-color: transparent;
+        }
+        .book-header[data-passcode-protected="true"] {
+            cursor: pointer; /* Override not-allowed for the header itself */
+        }
+        
         .book-header { border-bottom: 1px solid var(--card-border); }
-        .book-header:hover, .module-header:hover { background-color: var(--button-hover-bg); }
+        .book-header:not([data-locked="true"]):hover, .module-header:hover { 
+            background-color: var(--button-hover-bg); 
+        }
+        
         .book-title, .module-title { font-size: 1.1rem; font-weight: 600; color: var(--text-color); }
+        .book-title-wrapper { display: flex; align-items: center; gap: 0.75rem; }
+        .lock-icon {
+            color: var(--text-muted-color);
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+        .lock-icon.unlocked {
+            color: var(--good-text);
+        }
+
         .chevron { transition: transform 0.3s ease; color: var(--text-muted-color); }
         .rotate-180 { transform: rotate(180deg); }
         .book-content, .module-content {
             transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             max-height: 0; overflow: hidden; background-color: var(--sub-box-bg); padding: 0 1rem;
+        }
+        /* --- NEW: Style for locked book content --- */
+        .book-content[data-locked="true"] {
+            pointer-events: none;
+            user-select: none;
         }
         .book-content.open, .module-content.open { max-height: 10000px; padding: 1rem; }
         .module-card {
@@ -127,7 +155,7 @@
             border-radius: 1rem; margin-bottom: 1rem; overflow: hidden;
         }
 
-        /* Table Styles (Restored) */
+        /* Table Styles */
         .chapter-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .chapter-table th, .chapter-table td { padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid var(--card-border); font-size: 0.875rem; }
         .chapter-table th { background-color: transparent; color: var(--text-muted-color); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.75rem; border-bottom-width: 1px; }
@@ -148,14 +176,8 @@
         .view-report-button:hover:not(:disabled) { background-color: #4341a4; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(88, 86, 214, 0.2); }
         .no-report-span { background-color: #e5e7eb; color: #4b5563; font-size: 0.75rem; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 0.5rem; cursor: not-allowed; display: inline-block; }
 
-
-        /* --- MODIFICATION 1: Footer removed --- */
-        #appFooter {
-           display: none !important;
-        }
-         /* Hide footer when report page is active */
-         #page-report-viewer.active ~ #appFooter { display: none; }
-
+        #appFooter { display: none !important; }
+        #page-report-viewer.active ~ #appFooter { display: none; }
 
         /* Report Viewer Styles */
         .page { display: none; }
@@ -179,7 +201,7 @@
              flex-shrink: 0;
              height: auto;
              box-sizing: border-box;
-             position: relative; /* Needed for absolute positioning of title */
+             position: relative;
          }
          #page-report-viewer .report-viewer-header h2 {
              position: absolute;
@@ -203,8 +225,6 @@
         }
         .report-iframe { width: 100%; height: 100%; border: none; }
 
-
-        /* --- Full Screen Report Viewer Overrides --- */
         #appContainer:has(#page-report-viewer.active) {
             max-width: none;
             padding-left: 0;
@@ -223,9 +243,8 @@
                  padding-right: 2rem;
             }
         }
-        /* --- End Full Screen Report Viewer Overrides --- */
 
-        /* === EXACT Glassy Button Styles from Product Dashboard Light Mode === */
+         /* Glassy Button Styles */
          .glassy-button {
              background-color: var(--button-bg); color: var(--text-color); border: 1px solid var(--button-border);
              box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.7);
@@ -233,11 +252,25 @@
              font-weight: 600; padding: 0.6rem 1rem; border-radius: 9999px;
              transition: all 0.15s ease-out; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
              height: 40px; box-sizing: border-box; user-select: none; -webkit-user-select: none;
-             width: 40px; padding: 0; /* Icon only */
+             width: 40px; padding: 0;
         }
         .glassy-button.with-text {
              width: auto; padding: 0.6rem 1rem;
         }
+        .glassy-button.primary {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 2px 8px rgba(88, 86, 214, 0.25);
+            background-image: linear-gradient(to bottom, rgba(255,255,255,0.15), rgba(255,255,255,0));
+        }
+        .glassy-button.primary:hover:not(:disabled) {
+            background-color: #4341a4;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(88, 86, 214, 0.3);
+            border-color: transparent;
+        }
+        
         .glassy-button:hover:not(:disabled) {
              background-color: var(--button-hover-bg); border-color: rgba(0,0,0,0.1);
              transform: translateY(-1px);
@@ -257,18 +290,102 @@
         .glassy-button:disabled .spinner { display: inline-block; color: var(--button-disabled-text);}
         .back-button i { margin: 0; font-size: 1.1rem; }
         .refresh-btn i { margin: 0; font-size: 1.1rem; }
-         /* --- End Glassy Button Styles --- */
-
-        /* --- Other Styles --- (Accordion, Loader etc. - keeping brief for file size) */
-        .book-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06); overflow: hidden; flex-shrink: 0; }
-        .book-header, .module-header { padding: 1rem 1.5rem; cursor: pointer; transition: background-color 0.2s ease; display: flex; justify-content: space-between; align-items: center; }
-        .book-content, .module-content { transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s cubic-bezier(0.4, 0, 0.2, 1); max-height: 0; overflow: hidden; background-color: var(--sub-box-bg); padding: 0 1rem; }
-        .book-content.open, .module-content.open { max-height: 10000px; padding: 1rem; }
 
         .full-page-loader { display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column; background-color: var(--bg-color); position: fixed; inset: 0; z-index: 2000; transition: opacity 0.5s ease-in-out; opacity: 1; pointer-events: auto; }
         .full-page-loader.hidden { opacity: 0; pointer-events: none; }
         .spinner { border: 2px solid transparent; border-top-color: currentColor; border-radius: 50%; animation: spin 1s linear infinite; }
-        /* --- End Other Styles --- */
+
+        /* --- NEW: Passcode Modal Styles --- */
+        #passcode-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        #passcode-modal-backdrop.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #passcode-modal {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 60px -15px rgba(0,0,0,.25);
+            padding: 2rem;
+            width: 100%;
+            max-width: 380px;
+            margin: 1rem;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        #passcode-modal-backdrop.visible #passcode-modal {
+            transform: scale(1);
+        }
+        #passcode-modal h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        #passcode-modal p {
+            font-size: 0.9rem;
+            color: var(--text-muted-color);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        #passcode-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--button-disabled-border);
+            background-color: var(--button-bg);
+            text-align: center;
+            letter-spacing: 0.5em;
+            font-weight: 600;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+        }
+        #passcode-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.04), 0 0 0 3px rgba(88, 86, 214, 0.2);
+        }
+        #passcode-error {
+            color: var(--bad-text);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            min-height: 1.2em;
+            margin-top: 0.75rem;
+        }
+        #passcode-modal-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        #passcode-modal-buttons button {
+            flex: 1;
+        }
+        /* --- NEW: Shake animation for error --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .shake-modal {
+            animation: shake 0.5s ease-in-out;
+        }
+        /* --- End Passcode Modal Styles --- */
+
 
     </style>
 </head>
@@ -300,40 +417,27 @@
 
     <!-- Main Content Area -->
     <div id="appContainer" class="flex flex-col flex-grow">
-        <!-- Error State (Moved near top) -->
+        <!-- Error State -->
         <div id="error-message" class="bg-red-100 border border-red-400 text-red-700 px-4 py-4 rounded-lg relative my-6 hidden flex-shrink-0" role="alert">
             <strong class="font-bold">Error: </strong>
             <span class="block sm:inline" id="error-text"></span>
         </div>
 
-        <!--
-        ====================================================================
-        PAGE 1: Main Dashboard List
-        ====================================================================
-        -->
+        <!-- PAGE 1: Main Dashboard List -->
         <div id="page-dashboard" class="page active page-content">
-            <!-- Dashboard Content Area -->
-            <!-- We need the inner content to grow to push the footer down. -->
             <div id="dashboard-content" class="space-y-6 flex-grow">
-                <!-- Content generated by JS -->
                 <div class="text-center p-12 text-gray-500">Building dashboard...</div>
             </div>
         </div>
 
-        <!--
-        ====================================================================
-        PAGE 2: Report Viewer
-        ====================================================================
-        -->
+        <!-- PAGE 2: Report Viewer -->
         <div id="page-report-viewer" class="page page-content" style="display: none;">
-             <!-- Corrected inner container for flex grow -->
             <div class="report-viewer-inner-container flex flex-col flex-grow" style="min-height: 0;">
                 <!-- Header with Back Button and Centered Title -->
                 <div class="report-viewer-header flex-shrink-0 relative">
                     <button id="back-to-dashboard-button" class="back-button glassy-button z-10">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <!-- Title is centered via CSS -->
                     <h2 id="report-title" class="text-xl font-semibold text-gray-700 truncate">
                         Loading Report...
                     </h2>
@@ -352,13 +456,22 @@
             </div>
         </div>
 
-        <!-- --- MODIFICATION 1: Footer HTML removed --- -->
-        <!--
-        <footer id="appFooter">
-            Fintech QC Dashboard - Internal Tool
-        </footer>
-        -->
     </div>
+    
+    <!-- --- NEW: Passcode Modal HTML --- -->
+    <div id="passcode-modal-backdrop">
+        <div id="passcode-modal" role="dialog" aria-modal="true" aria-labelledby="passcode-title">
+            <h3 id="passcode-title">Enter Passcode</h3>
+            <p id="passcode-book-name">For Book: "..."</p>
+            <input type="password" id="passcode-input" placeholder="••••" maxlength="4" inputmode="numeric">
+            <div id="passcode-error"></div>
+            <div id="passcode-modal-buttons">
+                <button id="passcode-cancel-button" class="glassy-button with-text">Cancel</button>
+                <button id="passcode-submit-button" class="glassy-button with-text primary">Unlock</button>
+            </div>
+        </div>
+    </div>
+    <!-- --- End Passcode Modal HTML --- -->
 
 
     <script>
@@ -367,7 +480,7 @@
 
         // --- DOM Elements ---
         const pageLoader = document.getElementById('pageLoader');
-        const appHeader = document.getElementById('appHeader'); // Header element
+        const appHeader = document.getElementById('appHeader');
         const appContainer = document.getElementById('appContainer');
         const pageDashboard = document.getElementById('page-dashboard');
         const pageReportViewer = document.getElementById('page-report-viewer');
@@ -381,23 +494,49 @@
         const iframeWrapper = document.getElementById('iframe-wrapper');
         const iframeLoader = iframeWrapper.querySelector('.iframe-loader');
         const reportIframe = document.getElementById('report-iframe');
+        
+        // --- NEW: Passcode Modal DOM Elements ---
+        const passcodeModalBackdrop = document.getElementById('passcode-modal-backdrop');
+        const passcodeModal = document.getElementById('passcode-modal');
+        const passcodeBookName = document.getElementById('passcode-book-name');
+        const passcodeError = document.getElementById('passcode-error');
+        const passcodeSubmitButton = document.getElementById('passcode-submit-button');
+        const passcodeCancelButton = document.getElementById('passcode-cancel-button');
+        const passcodeInput = document.getElementById('passcode-input');
 
         let bookStructure = [];
         let qcSummaries = {};
+        
+        // --- NEW: State for passcode modal ---
+        let currentBookToUnlock = null; // Will store { bookName, targetId, headerElement }
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
-             if (WEB_APP_URL === "PASTE_YOUR_DEPLOYED_WEB_APP_URL_HERE") {
+             if (WEB_APP_URL.includes("PASTE_YOUR_DEPLOYED_WEB_APP_URL_HERE")) {
                 showError("Configuration Error: WEB_APP_URL is not set. Please edit this file.");
                 hideLoader();
                 return;
             }
-             // *** MODIFICATION: Load data using the default action first ***
-            loadData(false); // false means do not clear cache on initial load
+            loadData(false);
+            
+            // --- NEW: Passcode Modal Event Listeners ---
+            passcodeCancelButton.addEventListener('click', hidePasscodeModal);
+            passcodeSubmitButton.addEventListener('click', handleSubmitPasscode);
+            // Allow pressing Enter to submit
+            passcodeInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    handleSubmitPasscode();
+                }
+            });
+            // Close modal if clicking backdrop
+            passcodeModalBackdrop.addEventListener('click', (e) => {
+                if (e.target === passcodeModalBackdrop) {
+                    hidePasscodeModal();
+                }
+            });
         });
 
-        // *** MODIFICATION: Pass a flag to loadData ***
-        refreshButton.addEventListener('click', () => loadData(true)); // true means clear cache
+        refreshButton.addEventListener('click', () => loadData(true));
         backToDashboardButton.addEventListener('click', showDashboardPage);
 
         // --- Page Navigation ---
@@ -407,7 +546,7 @@
             pageDashboard.style.display = 'block';
              pageDashboard.classList.add('active');
             appHeader.style.display = 'flex';
-            document.body.style.paddingTop = 'var(--header-height)'; // RESTORE body padding
+            document.body.style.paddingTop = 'var(--header-height)';
             reportIframe.removeEventListener('load', handleIframeLoad);
             reportIframe.srcdoc = '';
             reportIframe.src = 'about:blank';
@@ -423,59 +562,40 @@
             return textarea.value;
         }
 
-        // --- Iframe Load Handler (Refined) ---
+        // --- Iframe Load Handler ---
         function handleIframeLoad() {
-            console.log("Iframe 'load' event triggered");
-            // Use a small delay to ensure contentDocument is accessible
             setTimeout(() => {
                 try {
                     const iframeWin = reportIframe.contentWindow;
                     const iframeDoc = reportIframe.contentDocument || iframeWin?.document;
-
                     if (!iframeDoc) {
-                        console.error("Could not access iframe document after load and delay.");
-                        iframeLoader.innerHTML = `<div class="p-4 text-center"><p class="text-red-500 font-bold">Error: Could not access report content document.</p></div>`;
-                        reportIframe.classList.add('hidden');
+                        console.error("Could not access iframe document.");
                         return;
                     }
-
-                    // Attach click listeners to internal anchor links
                     const internalLinks = iframeDoc.querySelectorAll('a[href^="#"]');
-                    console.log(`Found ${internalLinks.length} internal links inside iframe.`);
-
                     internalLinks.forEach(link => {
                         link.addEventListener('click', (event) => {
                             event.preventDefault();
                             event.stopPropagation();
-
                             const href = link.getAttribute('href');
-                            console.log(`Internal link clicked: ${href}`);
                             if (href && href.length > 1) {
                                 const targetId = href.substring(1);
                                 const targetElement = iframeDoc.getElementById(targetId);
                                 if (targetElement) {
-                                    console.log(`Scrolling to element: #${targetId}`);
                                     targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                 } else {
-                                    console.warn(`Target element not found in iframe: #${targetId}`);
                                  }
                             }
                         }, false);
                     });
-
-                    // Hide loader and show iframe after setup
                     iframeLoader.style.display = 'none';
                     reportIframe.classList.remove('hidden');
-                    console.log("Iframe navigation setup complete.");
-
                 } catch (error) {
                     console.error("Error setting up iframe navigation:", error);
                     iframeLoader.innerHTML = `<div class="p-4 text-center"><p class="text-red-500 font-bold">Error initializing report view: ${error.message}</p></div>`;
                     reportIframe.classList.add('hidden');
                 }
-            }, 100); // Small delay (e.g., 100ms)
+            }, 100);
         }
-
 
         function showReportPage(fileId, title) {
             pageDashboard.style.display = 'none';
@@ -483,7 +603,7 @@
             pageReportViewer.style.display = 'flex';
              pageReportViewer.classList.add('active');
             appHeader.style.display = 'none';
-            document.body.style.paddingTop = '0'; // REMOVE body padding
+            document.body.style.paddingTop = '0';
 
             const decodedTitle = decodeHtmlEntities(title);
             reportTitle.textContent = `Report: ${decodedTitle}`;
@@ -492,7 +612,7 @@
             iframeLoader.innerHTML = ` <div class="text-center p-12">
                                         <div class="spinner border-[var(--card-border)] border-t-[var(--accent-color)] w-12 h-12 animate-spin mx-auto"></div>
                                         <p class="mt-4 text-[var(--text-muted-color)]">Loading report content...</p>
-                                    </div>`; // Reset loader text and style
+                                    </div>`;
             reportIframe.classList.add('hidden');
             reportIframe.srcdoc = '';
             reportIframe.removeEventListener('load', handleIframeLoad);
@@ -520,7 +640,6 @@
                     if (data.status === 'success' && data.html !== undefined) {
                         reportIframe.addEventListener('load', handleIframeLoad, { once: true });
                         reportIframe.srcdoc = data.html;
-                        // Loader hiding is now handled in handleIframeLoad
                     } else {
                         throw new Error(data.message || 'Report HTML content missing in response.');
                     }
@@ -534,18 +653,13 @@
         }
 
         // --- Data Loading & Dashboard Building ---
-        // *** MODIFICATION: Accept a flag to clear the cache ***
         async function loadData(clearCache = false) {
             setLoading(true);
             showError(null);
-
-            // *** MODIFICATION: Choose action based on flag ***
             const action = clearCache ? 'clearCacheAndGetData' : 'getDashboardData';
             
             try {
-                // *** MODIFICATION: Use the new action in the URL ***
                 const response = await fetch(`${WEB_APP_URL}?action=${action}&cachebust=${new Date().getTime()}`);
-                
                 if (!response.ok) {
                      const errorText = await response.text();
                      if (errorText.includes("ScriptError")) throw new Error(`Apps Script Error. Check logs.`);
@@ -553,7 +667,7 @@
                      throw new Error(`Server error (${response.status}): ${errorText || response.statusText}`);
                 }
                 const contentType = response.headers.get("content-type");
-                 if (!contentType || !contentType.includes("application/json")) { // More flexible check
+                 if (!contentType || !contentType.includes("application/json")) {
                     let text = await response.text();
                     throw new Error(`Expected JSON but received ${contentType}. Content: ${text.substring(0, 200)}...`);
                 }
@@ -562,17 +676,12 @@
                 console.log('Received data:', data);
 
                 if (data.status === 'success') {
+                    // *** NEW: The structure now contains the passcode ***
                     bookStructure = data.structure || [];
                     qcSummaries = data.summaries ? new Map(Object.entries(data.summaries)) : new Map();
                     console.log('Processed Book Structure:', bookStructure);
-                    console.log('Processed QC Summaries Map:', qcSummaries);
                     buildDashboard();
-
-                    // *** ADDED: Also reload logger dropdowns if cache was cleared ***
                     if (clearCache) {
-                        // This is a conceptual addition. To *actually* update the logger,
-                        // the logger page would need to be reloaded or also re-fetch its structure.
-                        // This button only reloads the dashboard's data.
                         console.log("Dashboard refreshed. Logger will get new data on its next load.");
                     }
                 } else {
@@ -585,11 +694,10 @@
                  console.error("Load Data Error:", err);
             } finally {
                 setLoading(false);
-                 hideLoader(); // Use hideLoader consistently
+                 hideLoader();
             }
         }
 
-        // --- Loader Hide Function ---
         function hideLoader() {
              if (pageLoader && !pageLoader.classList.contains('hidden')) {
                  pageLoader.style.opacity = '0';
@@ -602,6 +710,85 @@
              }
         }
 
+         // --- NEW: Passcode Helper Functions ---
+         function showPasscodeModal(bookName, targetId, headerElement) {
+            currentBookToUnlock = { bookName, targetId, headerElement };
+            passcodeBookName.textContent = `For Book: "${bookName}"`;
+            passcodeModalBackdrop.classList.add('visible');
+            passcodeInput.focus();
+         }
+         
+         function hidePasscodeModal() {
+            passcodeModalBackdrop.classList.remove('visible');
+            passcodeError.textContent = '';
+            passcodeInput.value = '';
+            currentBookToUnlock = null;
+            passcodeModal.classList.remove('shake-modal');
+         }
+         
+         function handleSubmitPasscode() {
+            const enteredCode = passcodeInput.value;
+            if (!currentBookToUnlock || !enteredCode) return;
+            
+            const bookName = currentBookToUnlock.bookName;
+            const bookData = bookStructure.find(b => b.bookName === bookName);
+            
+            if (bookData && bookData.passcode === enteredCode) {
+                // SUCCESS
+                sessionStorage.setItem(`unlocked_${bookName}`, 'true');
+                const headerElement = currentBookToUnlock.headerElement;
+                const contentElement = document.getElementById(currentBookToUnlock.targetId);
+                
+                // Manually unlock and open
+                headerElement.dataset.locked = 'false';
+                contentElement.dataset.locked = 'false';
+                const lockIcon = headerElement.querySelector('.lock-icon');
+                if (lockIcon) {
+                    lockIcon.classList.remove('fa-lock');
+                    lockIcon.classList.add('fa-lock-open', 'unlocked');
+                }
+                
+                // --- BUG FIX: Manually enable module headers ---
+                const moduleHeaders = contentElement.querySelectorAll('.module-header');
+                moduleHeaders.forEach(header => {
+                    // Remove disabled styles
+                    header.style.cursor = 'pointer';
+                    header.style.opacity = '1';
+
+                    // Attach the click listener
+                    header.addEventListener('click', () => {
+                        const targetId = header.getAttribute('data-target');
+                        const content = document.getElementById(targetId);
+                        const chevron = header.querySelector('.chevron');
+                        if (content) {
+                            const isOpen = content.classList.contains('open');
+                            content.classList.toggle('open', !isOpen);
+                            chevron?.classList.toggle('rotate-180', !isOpen);
+                        }
+                    });
+                });
+                // --- END BUG FIX ---
+
+                // Manually open accordion
+                openAccordion(headerElement, contentElement);
+                
+                hidePasscodeModal();
+            } else {
+                // FAILURE
+                passcodeError.textContent = 'Incorrect passcode. Please try again.';
+                passcodeModal.classList.add('shake-modal');
+                passcodeInput.select();
+                // Remove shake animation after it finishes
+                setTimeout(() => {
+                    passcodeModal.classList.remove('shake-modal');
+                }, 500);
+            }
+         }
+         
+         // Helper to check session storage
+         function isBookUnlocked(bookName) {
+            return sessionStorage.getItem(`unlocked_${bookName}`) === 'true';
+         }
 
          function buildDashboard() {
             if (bookStructure.length === 0) {
@@ -612,6 +799,21 @@
             let html = '';
             bookStructure.forEach((book, bookIndex) => {
                 let moduleHtml = '';
+                
+                // --- NEW: Check for passcode and unlocked status ---
+                const hasPasscode = book.passcode && book.passcode.trim() !== '';
+                const unlocked = !hasPasscode || isBookUnlocked(book.bookName);
+                const lockedState = hasPasscode && !unlocked;
+                
+                let lockIconHtml = '';
+                if (hasPasscode) {
+                    if (unlocked) {
+                        lockIconHtml = `<i class="lock-icon unlocked fas fa-lock-open" title="Unlocked for this session"></i>`;
+                    } else {
+                        lockIconHtml = `<i class="lock-icon fas fa-lock" title="Passcode required"></i>`;
+                    }
+                }
+                // --- End NEW ---
 
                 book.modules.forEach((module, moduleIndex) => {
                     let chapterHtml = '';
@@ -621,22 +823,22 @@
                         const summary = qcSummaries.get(stableId);
 
                         const statusClass = summary ? 'status-done' : 'status-pending';
-                        const statusText = summary ? 'Done' : 'Pending'; // Shorter text
+                        const statusText = summary ? 'Done' : 'Pending';
                         const errors = (summary?.TotalErrors === null || summary?.TotalErrors === undefined || summary?.TotalErrors === '') ? '-' : summary.TotalErrors;
                         const aiPercentValue = summary?.AIPercent;
-                        const aiPercent = (aiPercentValue === null || aiPercentValue === undefined || aiPercentValue === '') ? '-' : `${parseFloat(aiPercentValue).toFixed(0)}%`; // No decimal for cleaner look
+                        const aiPercent = (aiPercentValue === null || aiPercentValue === undefined || aiPercentValue === '') ? '-' : `${parseFloat(aiPercentValue).toFixed(0)}%`;
                          let lastUpdated = '-';
                          if (summary?.LastUpdated) {
                              try {
                                  const dateObj = new Date(summary.LastUpdated);
                                  if (!isNaN(dateObj.getTime())) {
-                                     lastUpdated = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); // Shorter date
-                                 } else { console.warn(`Invalid date format for ${stableId}: ${summary.LastUpdated}`) }
-                             } catch (e) { console.warn(`Error parsing date for ${stableId}: ${summary.LastUpdated}`, e) }
+                                     lastUpdated = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                                 }
+                             } catch (e) { /* ignore */ }
                          }
 
-                        const errorClass = summary && errors !== '-' && parseInt(errors) > 0 ? 'text-[var(--bad-text)] font-semibold' : 'text-[var(--text-muted-color)]'; // Use theme color
-                        const aiClass = summary && aiPercent !== '-' && parseFloat(aiPercent) > 10 ? 'text-[var(--bad-text)] font-semibold' : 'text-[var(--text-muted-color)]'; // Use theme color
+                        const errorClass = summary && errors !== '-' && parseInt(errors) > 0 ? 'text-[var(--bad-text)] font-semibold' : 'text-[var(--text-muted-color)]';
+                        const aiClass = summary && aiPercent !== '-' && parseFloat(aiPercent) > 10 ? 'text-[var(--bad-text)] font-semibold' : 'text-[var(--text-muted-color)]';
 
                         const reportFileID = summary?.ReportFileID;
                         const buttonHtml = (reportFileID && String(reportFileID).trim() !== '') ?
@@ -649,7 +851,7 @@
                                 <td class="py-3 px-4 text-center"> <span class="status-pill ${statusClass}">${statusText}</span> </td>
                                 <td class="py-3 px-4 text-center text-sm ${errorClass}">${errors}</td>
                                 <td class="py-3 px-4 text-center text-sm ${aiClass}">${aiPercent}</td>
-                                <td class="py-3 px-4 text-center text-xs text-[var(--text-muted-color)]">${lastUpdated}</td> <!-- Smaller date font -->
+                                <td class="py-3 px-4 text-center text-xs text-[var(--text-muted-color)]">${lastUpdated}</td>
                                 <td class="py-3 px-4 text-center">${buttonHtml}</td>
                             </tr>
                         `;
@@ -665,12 +867,12 @@
                                 <table class="chapter-table min-w-full">
                                     <thead>
                                         <tr>
-                                            <th class="w-2/5 pl-4">Chapter</th> <!-- Align left -->
+                                            <th class="w-2/5 pl-4">Chapter</th>
                                             <th class="w-[10%] text-center">Status</th>
                                             <th class="w-[10%] text-center">Errors</th>
                                             <th class="w-[10%] text-center">AI %</th>
                                             <th class="w-[15%] text-center">Last QC'd</th>
-                                            <th class="w-[15%] text-center pr-4">Report</th> <!-- Align right -->
+                                            <th class="w-[15%] text-center pr-4">Report</th>
                                         </tr>
                                     </thead>
                                     <tbody style="background-color: var(--input-bg);">
@@ -684,11 +886,19 @@
 
                 html += `
                     <div class="book-card">
-                        <h2 class="book-header" data-target="book-content-${bookIndex}">
-                            <span class="book-title">Book: ${escapeHtml(book.bookName)}</span>
+                        <!-- --- NEW: Added data attributes for locking logic --- -->
+                        <h2 class="book-header" 
+                            data-target="book-content-${bookIndex}" 
+                            data-book-name="${escapeHtml(book.bookName)}"
+                            data-passcode-protected="${hasPasscode}"
+                            data-locked="${lockedState}">
+                            <span class="book-title-wrapper">
+                                ${lockIconHtml}
+                                <span class="book-title">Book: ${escapeHtml(book.bookName)}</span>
+                            </span>
                              <svg class="chevron h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"> <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /> </svg>
                         </h2>
-                        <div id="book-content-${bookIndex}" class="book-content space-y-4">
+                        <div id="book-content-${bookIndex}" class="book-content space-y-4" data-locked="${lockedState}">
                             ${moduleHtml || '<div class="p-4 text-center text-[var(--text-muted-color)]">No modules found for this book.</div>'}
                         </div>
                     </div>
@@ -700,17 +910,32 @@
             attachViewReportListeners();
         }
 
+        // --- NEW: Helper to programmatically open an accordion ---
+        function openAccordion(header, content) {
+            if (!content || !header) return;
+            const chevron = header.querySelector('.chevron');
+            content.classList.add('open');
+            chevron?.classList.add('rotate-180');
+        }
+
 
         function attachAccordionListeners() {
-            dashboardContent.querySelectorAll('.book-header, .module-header').forEach(header => {
+            dashboardContent.querySelectorAll('.book-header').forEach(header => {
                 header.addEventListener('click', () => {
                     const targetId = header.getAttribute('data-target');
                     const content = document.getElementById(targetId);
-                    const chevron = header.querySelector('.chevron');
-                    if (content) {
+                    const bookName = header.getAttribute('data-book-name');
+                    const isPasscodeProtected = header.getAttribute('data-passcode-protected') === 'true';
+                    
+                    if (isPasscodeProtected && !isBookUnlocked(bookName)) {
+                        // --- NEW: Book is locked, show modal ---
+                        console.log(`Book "${bookName}" is locked. Showing modal.`);
+                        showPasscodeModal(bookName, targetId, header);
+                    } else {
+                        // --- Book is not locked or already unlocked, toggle as usual ---
                         const isOpen = content.classList.contains('open');
                         content.classList.toggle('open', !isOpen);
-                        chevron?.classList.toggle('rotate-180', !isOpen);
+                        header.querySelector('.chevron')?.classList.toggle('rotate-180', !isOpen);
                     }
                 });
             });
@@ -727,19 +952,50 @@
             // if (firstModuleContent) firstModuleContent.classList.add('open');
             // if (firstModuleHeader) firstModuleHeader.querySelector('.chevron')?.classList.add('rotate-180');
             // --- END MODIFICATION ---
+
+            // Module accordion listeners remain unchanged
+            dashboardContent.querySelectorAll('.module-header').forEach(header => {
+                // --- NEW: Check if parent book is locked ---
+                const parentBookContent = header.closest('.book-content');
+                const isBookLocked = parentBookContent && parentBookContent.getAttribute('data-locked') === 'true';
+
+                if (isBookLocked) {
+                    // Don't attach click listener if book is locked
+                    header.style.cursor = 'not-allowed';
+                    header.style.opacity = '0.7';
+                } else {
+                    // Attach listener only if book is unlocked
+                    header.addEventListener('click', () => {
+                        const targetId = header.getAttribute('data-target');
+                        const content = document.getElementById(targetId);
+                        const chevron = header.querySelector('.chevron');
+                        if (content) {
+                            const isOpen = content.classList.contains('open');
+                            content.classList.toggle('open', !isOpen);
+                            chevron?.classList.toggle('rotate-180', !isOpen);
+                        }
+                    });
+                }
+            });
         }
 
 
         function attachViewReportListeners() {
             dashboardContent.querySelectorAll('.view-report-button').forEach(button => {
                 button.addEventListener('click', () => {
+                    // --- NEW: Check if parent book is locked ---
+                    const parentBookContent = button.closest('.book-content');
+                    if (parentBookContent && parentBookContent.getAttribute('data-locked') === 'true') {
+                        console.log("Cannot view report, book is locked.");
+                        return; // Do nothing if the book is locked
+                    }
+                    
                     const fileId = button.getAttribute('data-fileid');
                     const title = button.getAttribute('data-title');
                     if (fileId && fileId !== 'undefined' && fileId !== 'null' && String(fileId).trim() !== '') {
                         showReportPage(fileId, title);
                     } else {
                         console.error("View button clicked, but File ID is missing or invalid:", fileId, "Title:", title);
-                        // Replaced alert with console error as alerts are problematic
                         console.error("Cannot view report: File ID is missing. Check the QC_Database sheet.");
                     }
                 });
@@ -760,10 +1016,7 @@
          }
         function setLoading(isLoading) {
              refreshButton.disabled = isLoading;
-             // Remove text update for icon-only button
-             // refreshText.textContent = isLoading ? 'Refreshing...' : 'Refresh Data';
              refreshSpinner.style.display = isLoading ? 'inline-block' : 'none';
-              // Hide icon when loading
              refreshButton.querySelector('i').style.display = isLoading ? 'none' : 'inline-block';
         }
         function showError(message) {
@@ -777,4 +1030,3 @@
     </script>
 </body>
 </html>
-
